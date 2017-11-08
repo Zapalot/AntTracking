@@ -18,7 +18,7 @@
 #include "FlannBasedTracker.h"
 #include "CoordinateTranslator.h"
 #include "ZmqSender.h"
-//#define liveVideo
+#define liveVideo
 
 using namespace cv;
 using namespace std;
@@ -26,9 +26,10 @@ using namespace std;
 // global settings
 int camExposure = -6;
 
-
+//prototypes
 VideoCapture setupCamera(int &exposure); //prototype
 void createControlWindow(VideoCapture &cam);// prototype
+void onExposure(int slider_val, void* cam);
 
 // used to set coordinates in Image
 void mouseEvent(int event, int x, int y, int flags, void* userdata) {
@@ -105,17 +106,31 @@ VideoCapture setupCamera(int &exposure) {
 
 
 #ifdef liveVideo
+	int goodCamIndex = 1;
+	/*
+	for (int i = 0; i < 10; i++) {
+		cv::VideoCapture cam(i);
+		cam.set(CV_CAP_PROP_FPS, 30);
+		cam.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
+		cam.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
+		
+		if (cam.isOpened()) {
+			goodCamIndex = i;
+		}
+		cam.release();
+	}
+	*/
 	cv::VideoCapture cam(0);
-
 	cam.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
 	cam.set(CV_CAP_PROP_FPS, 30);
-	cam.set(CV_CAP_PROP_FRAME_WIDTH, 640);
-	cam.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+	cam.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
+	cam.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
 	cam.set(CV_CAP_PROP_AUTO_EXPOSURE, 0);
 	cam.set(CV_CAP_PROP_EXPOSURE, exposure);
 	cam.set(CV_CAP_PROP_GAIN, 1);
+	cam.set(CV_CAP_PROP_AUTOFOCUS , 0);
 	cam.set(CV_CAP_PROP_FOCUS, 1);
-
+	cam.set(CV_CAP_PROP_SETTINGS, 1);
 	if (!cam.isOpened()) {
 		std::cerr << "no camera detected" << std::endl;
 		std::cin.get();
